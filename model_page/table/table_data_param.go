@@ -12,12 +12,12 @@ const PaginationPage = 1      // 默认页码
 
 // Pagination 分页参数
 type Pagination struct {
-	Size int64 // 数量
-	Page int64 // 页码
+	Size int // 数量
+	Page int // 页码
 }
 
 // NewPagination 创建分页参数
-func NewPagination(page int64, size int64) *Pagination {
+func NewPagination(page int, size int) *Pagination {
 	if page <= 0 {
 		page = PaginationPage
 	}
@@ -37,15 +37,19 @@ type GetDataParam struct {
 	Filter     map[string]any // 筛选参数
 	Sort       []string       // 排序参数
 	Pagination *Pagination    // 分页参数
+	Req        *http.Request
 }
 
 func ParseGetDataParam(req *http.Request) *GetDataParam {
-	param := &GetDataParam{}
+	param := &GetDataParam{
+		Req:    req,
+		Filter: make(map[string]any),
+	}
 	query := req.URL.Query()
 	// 解析分页参数
 	page, _ := strconv.ParseInt(query.Get("_page"), 10, 64)
 	size, _ := strconv.ParseInt(query.Get("_size"), 10, 64)
-	param.Pagination = NewPagination(page, size)
+	param.Pagination = NewPagination(int(page), int(size))
 
 	// 解析排序参数
 	sort := query.Get("_sort")
@@ -57,7 +61,6 @@ func ParseGetDataParam(req *http.Request) *GetDataParam {
 	}
 
 	// 解析筛选参数
-	param.Filter = make(map[string]any)
 	for k := range query {
 		if len(k) > 8 && k[:8] == "_filter_" {
 			param.Filter[k[8:]] = query.Get(k)

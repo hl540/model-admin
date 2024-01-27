@@ -1,8 +1,6 @@
 package table
 
-import (
-	"github.com/hl540/model-admin/data_source"
-)
+import "github.com/hl540/model-admin/data_source"
 
 // TmplData 表格模板数据结构体
 type TmplData struct {
@@ -29,9 +27,44 @@ func (t *Table) GetTmplData(param *GetDataParam) (*TmplData, error) {
 // GetData 获取表格数据
 func (t *Table) GetData(param *GetDataParam) ([]map[string]any, int64, error) {
 	if t.getDataFn != nil {
-		return t.getDataFn(data_source.GetDB(), param)
+		return t.getDataFn(param)
 	}
-	return nil, 0, nil
+	// 获取数据源
+	if t.dataSource == "" {
+		t.dataSource = "default"
+	}
+	db, err := data_source.GetDB(t.dataSource)
+	if err != nil {
+		return nil, 0, err
+	}
+	// 开始查询数据
+	query := db.Table(t.tableName)
+	// 附件table过滤条件
+	if t.dataFilterFn != nil {
+		query = t.dataFilterFn(query)
+	}
+	// 设置请求过滤条件
+	for key, value := range param.Filter {
+		query.Where(key+" = ?", value)
+	}
+	// 查询总数
+	var count int64
+	if err = query.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+	// 排序
+	if param.Sort != nil {
+		query.Order(param.Sort[0] + " " + param.Sort[1])
+	}
+	// 分页
+	query.Offset((param.Pagination.Page - 1) * param.Pagination.Size)
+	query.Limit(param.Pagination.Size)
+	// 解析数据
+	var data []map[string]any
+	if err = query.Find(&data).Error; err != nil {
+		return nil, 0, err
+	}
+	return data, count, nil
 }
 
 // 解析表格数据

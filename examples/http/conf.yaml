@@ -1,0 +1,10 @@
+databases:
+  default:
+    driver: mysql
+    user: root
+    password: root
+    host: 127.0.0.1
+    port: 3306
+    name: test
+    maxIdle_conns: 10
+    maxOpen_conns: 100

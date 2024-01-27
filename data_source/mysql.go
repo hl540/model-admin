@@ -1,29 +1,55 @@
 package data_source
 
 import (
+	"fmt"
 	modeladmin "github.com/hl540/model-admin/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
+	"time"
 )
 
-var db *gorm.DB
+const DriverMysql = "mysql"
 
-func GetDB() *gorm.DB {
-	return db
+func init() {
+	AddInitFunc(DriverMysql, InitMysql)
 }
 
-func InitMysql(conf *modeladmin.Database) error {
-	var err error
-	//dsn := "root:123456@tcp(127.0.0.1:3306)/driving_school?charset=utf8mb4&parseTime=True&loc=Local"
-	dsn := "root:ml4489MLV@tcp(gz-cynosdbmysql-grp-4r0o7bkn.sql.tencentcdb.com:22110)/driving_school?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+// InitMysql 初始化mysql连接
+func InitMysql(name string, conf *modeladmin.Database) error {
+	dsn := mysqlDsn(conf)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   "t_", // 表名前缀，`User`表为`t_users`
-			SingularTable: true, // 使用单数表名，启用该选项后，`User` 表将是`user`
+			TablePrefix:   conf.Prefix, // 表名前缀，`User`表为`t_users`
+			SingularTable: true,        // 使用单数表名，启用该选项后，`User` 表将是`user`
 		},
 	})
-	return err
+	if err != nil {
+		return err
+	}
+	// 设置连接池
+	sqlDB, err := db.DB()
+	if err != nil {
+		return err
+	}
+	sqlDB.SetMaxIdleConns(conf.MaxIdleConns)
+	sqlDB.SetMaxOpenConns(conf.MaxOpenConns)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	// 添加到全局db表
+	AddDB(name, db)
+	return nil
+}
+
+// 解析dns
+func mysqlDsn(conf *modeladmin.Database) string {
+	if conf.Dns != "" {
+		return conf.Dns
+	}
+	return fmt.Sprintf(
+		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		conf.User, conf.Password, conf.Host, conf.Port, conf.Name,
+	)
 }
