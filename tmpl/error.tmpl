@@ -1,0 +1,16 @@
+<div>
+    <p style="color: red">{{.Error}}</p>
+    {{if .Debug}}
+        <h3>{{.Url}}</h3>
+        <h3>{{.Method}}</h3>
+        <h3>{{.Header}}</h3>
+        <h3>{{.Body}}</h3>
+
+        <p>错误堆栈信息：</p>
+        <ul>
+            {{range $stack := .Stacks}}
+                <li>{{$stack}}</li>
+            {{end}}
+        </ul>
+    {{end}}
+</div>

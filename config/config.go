@@ -18,8 +18,16 @@ type Database struct {
 	MaxOpenConns int    `yaml:"maxOpen_conns"` // 最大连接数
 }
 
+type Debug struct {
+	Enable bool `yaml:"enable"`
+}
+
 type Config struct {
-	Databases map[string]*Database `yaml:"databases"`
+	RouterPrefix string               `yaml:"router_prefix"` // 路由前缀
+	TemplatePath string               `yaml:"template_path"` // 模板路径
+	ServerListen string               `yaml:"server_listen"` // http服务配置
+	Databases    map[string]*Database `yaml:"databases"`     // db配置
+	Debug        *Debug               `yaml:"debug"`         // 调试模式
 }
 
 var config = &Config{}
@@ -35,4 +43,9 @@ func LoadFromYaml(path string) (*Config, error) {
 		return nil, err
 	}
 	return config, nil
+}
+
+// GetDebugConf 获取调试配置
+func GetDebugConf() *Debug {
+	return config.Debug
 }

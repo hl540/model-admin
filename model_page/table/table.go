@@ -7,6 +7,7 @@ type Table struct {
 	title        string             // 表格title
 	tableName    string             // 数据表名称
 	dataSource   string             // 数据源名称
+	joins        []string           // 连表条件，可以有多个
 	columns      []*Column          // 所有列
 	columnMap    map[string]*Column // 所有列
 	getDataFn    GetDataFn          // 自定义数据方法
@@ -23,6 +24,20 @@ func (t *Table) SetTitle(title string) *Table {
 func (t *Table) SetTableName(tableName string) *Table {
 	t.tableName = tableName
 	return t
+}
+
+// AddColumn 添加一列
+func (t *Table) AddColumn(name, title string) *Column {
+	column := &Column{
+		name:  name,
+		Title: title,
+	}
+	t.columns = append(t.columns, column)
+	if t.columnMap == nil {
+		t.columnMap = make(map[string]*Column)
+	}
+	t.columnMap[name] = column
+	return column
 }
 
 // GetDataFn 格数据方法
@@ -49,26 +64,8 @@ func (t *Table) SetDataFilterFn(fn DataFilterFn) *Table {
 	return t
 }
 
-// AddColumn 添加一列
-func (t *Table) AddColumn(name, title string) *Column {
-	column := &Column{
-		Name:  name,
-		Title: title,
-	}
-	t.columns = append(t.columns, column)
-	if t.columnMap == nil {
-		t.columnMap = make(map[string]*Column)
-	}
-	t.columnMap[name] = column
-	return column
-}
-
-// GetColumn 获取单个列
-func (t *Table) GetColumn(title string) *Column {
-	return t.columnMap[title]
-}
-
-// GetColumns 获取所有个列
-func (t *Table) GetColumns() []*Column {
-	return t.columns
+// Join 连表
+func (t *Table) Join(expression string) *Table {
+	t.joins = append(t.joins, expression)
+	return t
 }

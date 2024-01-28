@@ -1,3 +1,10 @@
+# 路由前缀
+router_prefix: admin
+# 模板路径
+template_path: ../../tmpl
+# http服务配置
+server_listen: :9696
+# db配置
 databases:
   default:
     driver: mysql
@@ -8,3 +15,6 @@ databases:
     name: test
     maxIdle_conns: 10
     maxOpen_conns: 100
+# 调试配置
+debug:
+  enable: true

@@ -28,7 +28,7 @@ var tableData = []map[string]any{
 
 func TestTableTemplate(t *testing.T) {
 	table := &table2.Table{}
-	table.AddColumn("name", "名称").SetDisplay(func(value any) template.HTML {
+	table.AddColumn("name", "名称").SetDisplayFn(func(value any) template.HTML {
 		return template.HTML(fmt.Sprintf("<h1>%v<h1>", value))
 	})
 	table.AddColumn("age", "年龄")
