@@ -1,7 +1,7 @@
 # 路由前缀
 router_prefix: admin
 # 模板路径
-template_path: ../../tmpl
+template_name: eui_template
 # http服务配置
 server_listen: :9696
 # db配置

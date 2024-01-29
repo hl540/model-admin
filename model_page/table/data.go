@@ -1,34 +1,19 @@
 package table
 
 import (
-	"github.com/hl540/model-admin/data_source"
-	"github.com/pkg/errors"
 	"html/template"
+
+	"github.com/hl540/model-admin/data_source"
 )
 
-// TmplData 表格模板数据结构体
-type TmplData struct {
-	Title   string            // 标题
-	Columns []*Column         // 列配置
-	Data    [][]template.HTML // 数据
-	Count   int64             // 数据总数
-}
-
 // GetTmplData 获取表格模板数据
-func (t *Table) GetTmplData(param *GetDataParam) (*TmplData, error) {
-	return nil, errors.New("测试错误")
+func (t *Table) GetTmplData(param *GetDataParam) ([][]template.HTML, int64, error) {
 	// 加载数据
 	data, count, err := t.GetData(param)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	// 组装模板参数
-	return &TmplData{
-		Title:   t.title,
-		Columns: t.columns,
-		Data:    t.parseData(data),
-		Count:   count,
-	}, nil
+	return t.parseData(data), count, nil
 }
 
 // GetData 获取表格数据
@@ -45,7 +30,7 @@ func (t *Table) GetData(param *GetDataParam) ([]map[string]any, int64, error) {
 		return nil, 0, err
 	}
 	// 开始查询数据
-	query := db.Table(t.tableName)
+	query := db.Table(t.TableName)
 	// 连表
 	for _, joinExpression := range t.joins {
 		query.Joins(joinExpression)
@@ -86,9 +71,9 @@ func (t *Table) parseQueryColumnName() []string {
 	var columnNames []string
 	for _, col := range t.columns {
 		if col.joinName == "" {
-			columnNames = append(columnNames, t.tableName+"."+col.name+" AS "+col.name)
+			columnNames = append(columnNames, t.TableName+"."+col.Name+" AS "+col.Name)
 		} else {
-			columnNames = append(columnNames, col.joinName+" AS "+col.name)
+			columnNames = append(columnNames, col.joinName+" AS "+col.Name)
 		}
 	}
 	return columnNames

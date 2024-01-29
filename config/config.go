@@ -1,8 +1,9 @@
 package config
 
 import (
-	"gopkg.in/yaml.v3"
 	"os"
+
+	"gopkg.in/yaml.v3"
 )
 
 type Database struct {
@@ -24,7 +25,7 @@ type Debug struct {
 
 type Config struct {
 	RouterPrefix string               `yaml:"router_prefix"` // 路由前缀
-	TemplatePath string               `yaml:"template_path"` // 模板路径
+	TemplateName string               `yaml:"template_name"` // 模板名称
 	ServerListen string               `yaml:"server_listen"` // http服务配置
 	Databases    map[string]*Database `yaml:"databases"`     // db配置
 	Debug        *Debug               `yaml:"debug"`         // 调试模式
@@ -48,4 +49,9 @@ func LoadFromYaml(path string) (*Config, error) {
 // GetDebugConf 获取调试配置
 func GetDebugConf() *Debug {
 	return config.Debug
+}
+
+// GetTemplateName 获取调试配置
+func GetTemplateName() string {
+	return config.TemplateName
 }

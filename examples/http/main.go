@@ -1,16 +1,13 @@
 package main
 
 import (
-	modeladmin "github.com/hl540/model-admin"
-	table2 "github.com/hl540/model-admin/model_page/table"
-	template2 "github.com/hl540/model-admin/template"
 	"log"
 	"net/http"
-)
 
-func init() {
-	template2.SetTemplatePath("./tmpl")
-}
+	modeladmin "github.com/hl540/model-admin/handler"
+	table2 "github.com/hl540/model-admin/model_page/table"
+	_ "github.com/hl540/model-admin/src/eui_template"
+)
 
 func main() {
 	handler := modeladmin.New()
@@ -44,7 +41,7 @@ type UserModel struct{}
 func (u *UserModel) Table() *table2.Table {
 	table := &table2.Table{}
 	table.Join("LEFT JOIN role ON user.role_id = role.id")
-	table.AddColumn("id", "ID").DisplayLink("https://www.baidu.com?wd={id}", "_blank")
+	table.AddColumn("id", "ID").SetPrimary().DisplayLink("https://www.baidu.com?wd={id}", "_blank")
 	table.AddColumn("name", "名称")
 	table.AddColumn("age", "年龄")
 	table.AddColumn("sex", "性别").SetValueMap(map[string]any{

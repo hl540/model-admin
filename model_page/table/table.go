@@ -4,8 +4,8 @@ import "gorm.io/gorm"
 
 // Table 表格
 type Table struct {
-	title        string             // 表格title
-	tableName    string             // 数据表名称
+	Title        string             // 表格title
+	TableName    string             // 数据表名称
 	dataSource   string             // 数据源名称
 	joins        []string           // 连表条件，可以有多个
 	columns      []*Column          // 所有列
@@ -16,20 +16,20 @@ type Table struct {
 
 // SetTitle 设置表格title
 func (t *Table) SetTitle(title string) *Table {
-	t.title = title
+	t.Title = title
 	return t
 }
 
 // SetTableName 设置数据库表名称
 func (t *Table) SetTableName(tableName string) *Table {
-	t.tableName = tableName
+	t.TableName = tableName
 	return t
 }
 
 // AddColumn 添加一列
 func (t *Table) AddColumn(name, title string) *Column {
 	column := &Column{
-		name:  name,
+		Name:  name,
 		Title: title,
 	}
 	t.columns = append(t.columns, column)
@@ -38,6 +38,11 @@ func (t *Table) AddColumn(name, title string) *Column {
 	}
 	t.columnMap[name] = column
 	return column
+}
+
+// GetColumns 获取所有列
+func (t *Table) GetColumns() []*Column {
+	return t.columns
 }
 
 // GetDataFn 格数据方法

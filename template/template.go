@@ -1,73 +1,50 @@
 package template
 
 import (
-	"fmt"
+	"html/template"
+	"net/http"
+
 	"github.com/hl540/model-admin/config"
 	"github.com/hl540/model-admin/model_page/table"
-	"github.com/hl540/model-admin/tools"
-	"github.com/pkg/errors"
-	"html/template"
-	"io"
-	"net/http"
-	"strings"
 )
 
-var templatePath = "./template"
-
-func SetTemplatePath(path string) {
-	templatePath = path
+// LayoutPageRender 首页页面模板渲染，它是界面的最外层，包裹其他页面
+func LayoutPageRender(req *http.Request) template.HTML {
+	render := GetRender(config.GetTemplateName())
+	return render.LayoutPageRender(req)
 }
 
-// TableTemplate 表格页面模板生成
-func TableTemplate(tableModel *table.Table, req *http.Request) template.HTML {
-	// 解析参数
-	param := table.ParseGetDataParam(req)
-	// 加载表格模板文件
-	tmpl, err := template.New("tableModel.tmpl").ParseFiles(templatePath + "/tableModel.tmpl")
-	if err != nil {
-		return ErrorTemplate(err, req)
-	}
-	// 加载模板值
-	tmplData, err := tableModel.GetTmplData(param)
-	if err != nil {
-		return ErrorTemplate(err, req)
-	}
-	//编译模板
-	htmlStr, err := tools.ExecuteTemplate(tmpl, tmplData)
-	if err != nil {
-		return ErrorTemplate(err, req)
-	}
-	return htmlStr
+// TablePageRender 表格页面模板渲染
+func TablePageRender(tableModel *table.Table, req *http.Request) template.HTML {
+	render := GetRender(config.GetTemplateName())
+	return render.TablePageRender(tableModel, req)
 }
 
-type ErrorTmplData struct {
-	Debug  bool
-	Error  string
-	Url    string
-	Method string
-	Header http.Header
-	Body   string
-	Stacks []string
+// ErrorPageTemplate 错误页面模板渲染
+func ErrorPageTemplate(err error, req *http.Request) template.HTML {
+	render := GetRender(config.GetTemplateName())
+	return render.ErrorPageRender(err, req)
 }
 
-// ErrorTemplate 错误页面模板生成
-func ErrorTemplate(err error, req *http.Request) template.HTML {
-	// 加载表格模板文件
-	tmpl, tmplErr := template.New("error.tmpl").ParseFiles(templatePath + "/error.tmpl")
-	if tmplErr != nil {
-		return template.HTML(err.Error())
-	}
-	//编译模板
-	body, _ := io.ReadAll(req.Body)
-	stack := fmt.Sprintf("%+v", errors.WithStack(err))
-	stacks := strings.Split(stack, "\n")
-	return tools.ExecuteTemplateNoError(tmpl, ErrorTmplData{
-		Debug:  config.GetDebugConf().Enable,
-		Error:  err.Error(),
-		Url:    req.URL.String(),
-		Method: req.Method,
-		Header: req.Header,
-		Body:   string(body),
-		Stacks: stacks,
-	})
+// 模板渲染器集合
+var templateRender = map[string]Render{}
+
+// AddRender 设置一个模板渲染器
+func AddRender(name string, render Render) {
+	templateRender[name] = render
+}
+
+// GetRender 获取一个模板渲染器
+func GetRender(name string) Render {
+	return templateRender[name]
+}
+
+// Render 模板渲染器
+type Render interface {
+	// LayoutPageRender 首页页面模板渲染，它是界面的最外层，包裹其他页面
+	LayoutPageRender(req *http.Request) template.HTML
+	// TablePageRender 表格页面模板渲染
+	TablePageRender(tableModel *table.Table, req *http.Request) template.HTML
+	// ErrorPageRender 错误页面模板渲染
+	ErrorPageRender(err error, req *http.Request) template.HTML
 }

@@ -2,10 +2,11 @@ package table
 
 import (
 	"fmt"
-	"github.com/hl540/model-admin/tools"
-	"github.com/spf13/cast"
 	"html/template"
 	url2 "net/url"
+
+	"github.com/hl540/model-admin/tools"
+	"github.com/spf13/cast"
 )
 
 // DisplayImage 展示为图片
@@ -18,10 +19,9 @@ func (c *Column) DisplayImage(width, height int) {
 	}
 	c.SetDisplayFn(func(value map[string]any) template.HTML {
 		text := `<img src="{{.src}}" alt="{{.alt}}" width="{{.width}}px" height="{{.height}}px">`
-		tmpl := template.Must(template.New("ColumnDisplayImage").Parse(text))
-		return tools.ExecuteTemplateNoError(tmpl, map[string]any{
-			"src":    cast.ToString(value[c.name]),
-			"alt":    value[c.name],
+		return tools.ExecuteTemplateString("ColumnDisplayImage", text, map[string]any{
+			"src":    cast.ToString(value[c.Name]),
+			"alt":    value[c.Name],
 			"width":  width,
 			"height": height,
 		})
@@ -31,7 +31,7 @@ func (c *Column) DisplayImage(width, height int) {
 // DisplayDateTime 展示为日期
 func (c *Column) DisplayDateTime(layout string) {
 	c.SetDisplayFn(func(value map[string]any) template.HTML {
-		valueStr := cast.ToString(value[c.name])
+		valueStr := cast.ToString(value[c.Name])
 		time, err := cast.StringToDate(valueStr)
 		if err != nil {
 			return template.HTML(err.Error())
