@@ -1,9 +1,10 @@
-<h1>{{.Title}}</h1>
+{{define "model_table"}}
+<h1>{{.Title}}xxxxwwwwwwwwxxxxxx</h1>
 <table border="1">
     <thead>
         <tr>
             {{range $colIndex,$col := .Columns}}
-                <td>{{$col.Title}}</td>
+                <td>{{$col.title}}</td>
             {{end}}
         </tr>
     </thead>
@@ -17,3 +18,4 @@
     {{end}}
     </tbody>
 </table>
+{{end}}

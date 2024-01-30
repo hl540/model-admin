@@ -9,7 +9,6 @@ import (
 	"github.com/hl540/model-admin/config"
 	"github.com/hl540/model-admin/data_source"
 	"github.com/hl540/model-admin/model_page"
-	"github.com/hl540/model-admin/template"
 )
 
 // Handler 模型页面处理器
@@ -34,6 +33,7 @@ func (h *Handler) SetConfig(conf *config.Config) *Handler {
 	return h
 }
 
+// Init 初始化
 func (h *Handler) Init() error {
 	// 初始化db
 	if err := data_source.InitDB(h.conf.Databases); err != nil {
@@ -41,11 +41,8 @@ func (h *Handler) Init() error {
 	}
 
 	// 初始化应用配置
-	h.routerPrefix = h.conf.RouterPrefix
-
-	// 添加资源路由
-	for path, handler := range extraHandler {
-		h.router.PathPrefix(path).Handler(handler).Methods("GET")
+	if h.conf.RouterPrefix != "" {
+		h.routerPrefix = h.conf.RouterPrefix
 	}
 
 	// 初始化默认路由
@@ -53,6 +50,11 @@ func (h *Handler) Init() error {
 
 	// 初始化模型路由
 	h.initModelPageRouter()
+
+	// 添加资源路由
+	for path, handler := range extraHandler {
+		h.router.PathPrefix(path).Handler(handler).Methods("GET")
+	}
 
 	// 输出路由注册log
 	h.printPageRouterLogs()
@@ -83,18 +85,36 @@ func (h *Handler) initModelPageRouter() {
 	}
 }
 
-// AddModelPage 添加单个模型页面
+// AddModelPage 注册单个模型页面
 func (h *Handler) AddModelPage(name string, modelPage any) {
+	// 注册模型表格页面处理器
+	if tablePage, ok := modelPage.(model_page.ModelTablePage); ok {
+		h.addModelTablePageHandler(name, tablePage.Table())
+	}
+	// 注册模型详情页面处理器
+	if detailPage, ok := modelPage.(model_page.ModelDetailPage); ok {
+		h.addModelDetailPageHandler(name, detailPage.Detail())
+	}
+	// 注册新建和编辑页面处理器，新建和编辑可以互相复用
+	// 新建和编辑可以复用，如果其中一个有实现另一个没有就复用实现的那个
+	newPage, npOk := modelPage.(model_page.ModelNewPage)
+	editPage, epOk := modelPage.(model_page.ModelEditPage)
+	// 如果新增页面有实现而编辑页面没有实现，则编辑复用新增的
+	if npOk {
+		h.addModelNewPageHandler(name, newPage.New())
+		if !epOk {
+			h.addModelEditPageHandler(name, newPage.New())
+		}
+	}
+	// 如果编辑页面有实现而新增页面没有实现，则编辑复用编辑的
+	if epOk {
+		h.addModelNewPageHandler(name, editPage.Edit())
+		if !npOk {
+			h.addModelEditPageHandler(name, editPage.Edit())
+		}
+	}
 	// 添加到已注册模型页面
 	h.modelPages[name] = modelPage
-	// 注册路由
-	if tablePage, ok := modelPage.(model_page.ModelTablePage); ok {
-		path := fmt.Sprintf("/%s/%s/list", h.routerPrefix, name)
-		h.AddHandleFunc(name, path, func(writer http.ResponseWriter, request *http.Request) {
-			tmpl := template.TablePageRender(tablePage.Table(), request)
-			writer.Write([]byte(tmpl))
-		}, "GET")
-	}
 }
 
 // 添加路由注册日志

@@ -1,11 +1,12 @@
 package bootstrap_admin_ui
 
 import (
+	"embed"
 	"fmt"
 	"html/template"
+	"io/fs"
 	"net/http"
-	"path/filepath"
-	"runtime"
+	"os"
 	"strings"
 
 	"github.com/hl540/model-admin/config"
@@ -15,31 +16,64 @@ import (
 	"github.com/pkg/errors"
 )
 
+//go:embed templates/*.tmpl
+var templateFs embed.FS
+
 const Name = "bootstrap_admin_ui"
 
+// 初始化Render
+var render = &BootstrapAdminRender{
+	templateFs: templateFs,
+	fsPatterns: "templates/*.tmpl",
+}
+
 func init() {
-	_, file, _, _ := runtime.Caller(0)
-	absPath := filepath.Dir(file)
+	// 加载模板
+	template, err := template.ParseFS(render.templateFs, render.fsPatterns)
+	if err != nil {
+		panic(err)
+	}
+	render.template = template
 	// 注册渲染器
-	template2.AddRender(Name, &BootstrapAdminRender{
-		templatePath: absPath + "/template",
-	})
+	template2.AddRender(Name, render)
+}
+
+// SetTemplatePath 自定义模板路径
+// 执行这个操作将替换掉init中嵌入的模板
+func SetTemplatePath(path string) error {
+	// 创建新的fs
+	fs := os.DirFS(path)
+	// 加载模板
+	template, err := template.ParseFS(fs, "*.tmpl")
+	if err != nil {
+		return err
+	}
+	render.templateFs = fs
+	render.fsPatterns = "*.tmpl"
+	render.template = template
+	return nil
 }
 
 // BootstrapAdminRender bootstrap-admin模板
 // https://www.bootstrap-admin.top/
 type BootstrapAdminRender struct {
-	templatePath string
+	templateFs fs.FS
+	template   *template.Template
+	fsPatterns string
+}
+
+// LoadTemplate 加载模板
+func (r *BootstrapAdminRender) LoadTemplate() (*template.Template, error) {
+	if config.GetDebug().Enable {
+		return template.ParseFS(r.templateFs, r.fsPatterns)
+	}
+	return r.template, nil
 }
 
 // LayoutPageRender 首页页面模板渲染
 func (r *BootstrapAdminRender) LayoutPageRender(req *http.Request) template.HTML {
 	// 编译模板内容
-	templateFiles := []string{
-		r.templatePath + "/common.tmpl",
-		r.templatePath + "/layout.tmpl",
-	}
-	htmlStr, err := tools.ExecuteTemplateFile("layout", templateFiles, nil)
+	htmlStr, err := tools.ExecuteTemplateFile(r.template, "layout", nil)
 	if err != nil {
 		return r.ErrorPageRender(err, req)
 	}
@@ -91,8 +125,8 @@ func (r *BootstrapAdminRender) TablePageRender(tableModel *table.Table, req *htt
 		})
 	}
 	// 编译模板内容
-	templateFiles := []string{r.templatePath + "/model_table.tmpl"}
-	htmlStr, err := tools.ExecuteTemplateFile("model_table", templateFiles, tmplData)
+	template := template.Must(r.LoadTemplate())
+	htmlStr, err := tools.ExecuteTemplateFile(template, "model_table", tmplData)
 	if err != nil {
 		return r.ErrorPageRender(err, req)
 	}
@@ -103,15 +137,15 @@ func (r *BootstrapAdminRender) TablePageRender(tableModel *table.Table, req *htt
 func (r *BootstrapAdminRender) ErrorPageRender(err error, req *http.Request) template.HTML {
 	// 加载模板数据
 	tmplData := make(map[string]any)
-	tmplData["debug"] = config.GetDebugConf().Enable
+	tmplData["debug"] = config.GetDebug().Enable
 	// debug模式
-	if config.GetDebugConf().Enable {
+	if config.GetDebug().Enable {
 		// 获取错误堆栈信息
 		stack := fmt.Sprintf("%+v", errors.WithStack(err))
 		tmplData["error_stacks"] = strings.Split(stack, "\n")
 	}
 	tmplData["error_message"] = err.Error()
 	// 编译模板内容
-	templateFiles := []string{r.templatePath + "/error.tmpl"}
-	return tools.ExecuteTemplateFileNoError("error", templateFiles, tmplData)
+	template := template.Must(r.LoadTemplate())
+	return tools.ExecuteTemplateFileNoError(template, "error", tmplData)
 }

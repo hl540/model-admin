@@ -1,16 +1,19 @@
 package main
 
 import (
+	_ "github.com/hl540/model-admin/src/bootstrap_admin_ui"
 	"log"
 	"net/http"
 
 	"github.com/hl540/model-admin/config"
 	modeladmin "github.com/hl540/model-admin/handler"
 	table2 "github.com/hl540/model-admin/model_page/table"
-	_ "github.com/hl540/model-admin/src/bootstrap_admin_ui"
 )
 
 func main() {
+	//if err := bootstrap_admin_ui.SetTemplatePath("../../tmpl"); err != nil {
+	//	log.Fatal(err)
+	//}
 	conf, err := config.LoadFromYaml("./conf.yaml")
 	if err != nil {
 		log.Fatal(err)

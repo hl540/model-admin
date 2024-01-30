@@ -33,6 +33,8 @@ type Config struct {
 
 var config = &Config{}
 
+var debug = &Debug{Enable: true}
+
 // LoadFromYaml 加载yaml配置
 func LoadFromYaml(path string) (*Config, error) {
 	jsonByte, err := os.ReadFile(path)
@@ -43,12 +45,13 @@ func LoadFromYaml(path string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	debug = config.Debug
 	return config, nil
 }
 
-// GetDebugConf 获取调试配置
-func GetDebugConf() *Debug {
-	return config.Debug
+// GetDebug 获取调试配置
+func GetDebug() *Debug {
+	return debug
 }
 
 // GetTemplateName 获取调试配置

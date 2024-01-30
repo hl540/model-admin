@@ -41,6 +41,8 @@ func GetRender(name string) Render {
 
 // Render 模板渲染器
 type Render interface {
+	// LoadTemplate 加载模板
+	LoadTemplate() (*template.Template, error)
 	// LayoutPageRender 首页页面模板渲染，它是界面的最外层，包裹其他页面
 	LayoutPageRender(req *http.Request) template.HTML
 	// TablePageRender 表格页面模板渲染
