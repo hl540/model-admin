@@ -1,14 +1,14 @@
 package main
 
 import (
+	modeladmin "github.com/hl540/model-admin"
+	table2 "github.com/hl540/model-admin/model_page/table_page"
 	"log"
 	"net/http"
 
 	_ "github.com/hl540/model-admin/src/bootstrap_admin_ui"
 
 	"github.com/hl540/model-admin/config"
-	modeladmin "github.com/hl540/model-admin/handler"
-	table2 "github.com/hl540/model-admin/model_page/table"
 )
 
 func main() {

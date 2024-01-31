@@ -2,7 +2,7 @@ package template
 
 import (
 	"fmt"
-	table2 "github.com/hl540/model-admin/model_page/table"
+	table_page2 "github.com/hl540/model-admin/model_page/table_page"
 	"gorm.io/gorm"
 	"html/template"
 	"testing"
@@ -27,13 +27,13 @@ var tableData = []map[string]any{
 }
 
 func TestTableTemplate(t *testing.T) {
-	table := &table2.Table{}
+	table := &table_page2.Table{}
 	table.AddColumn("name", "名称").SetDisplayFn(func(value any) template.HTML {
 		return template.HTML(fmt.Sprintf("<h1>%v<h1>", value))
 	})
 	table.AddColumn("age", "年龄")
 	table.AddColumn("sex", "性别")
-	table.SetGetDataFn(func(db *gorm.DB, param *table2.GetDataParam) ([]map[string]any, int64, error) {
+	table.SetGetDataFn(func(db *gorm.DB, param *table_page2.GetDataParam) ([]map[string]any, int64, error) {
 		return tableData, int64(len(tableData)), nil
 	})
 	SetTemplatePath("./tmpl")

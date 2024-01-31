@@ -3,6 +3,7 @@ package bootstrap_admin_ui
 import (
 	"embed"
 	"fmt"
+	"github.com/hl540/model-admin/model_page/table_page"
 	"html/template"
 	"net/http"
 	"os"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/Masterminds/sprig/v3"
 	"github.com/hl540/model-admin/config"
-	"github.com/hl540/model-admin/model_page/table"
 	template2 "github.com/hl540/model-admin/template"
 	"github.com/hl540/model-admin/tools"
 	"github.com/pkg/errors"
@@ -83,9 +83,9 @@ type TablePageTemplateData struct {
 }
 
 // TablePageRender 表格页面模板渲染
-func (r *BootstrapAdminRender) TablePageRender(tableModel *table.Table, req *http.Request) template.HTML {
+func (r *BootstrapAdminRender) TablePageRender(tableModel *table_page.Table, req *http.Request) template.HTML {
 	// 解析参数
-	param := table.ParseGetDataParam(req)
+	param := table_page.ParseGetDataParam(req)
 	// 加载模板数据
 	data, count, err := tableModel.GetTmplData(param)
 	if err != nil {

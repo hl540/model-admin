@@ -1,4 +1,4 @@
-package table
+package table_page
 
 import "gorm.io/gorm"
 

@@ -1,4 +1,4 @@
-package table
+package table_page
 
 import (
 	"github.com/hl540/model-admin/data_source"
