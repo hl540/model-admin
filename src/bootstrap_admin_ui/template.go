@@ -4,9 +4,10 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
-	"io/fs"
 	"net/http"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/hl540/model-admin/config"
@@ -19,53 +20,36 @@ import (
 //go:embed templates/*.tmpl
 var templateFs embed.FS
 
-const Name = "bootstrap_admin_ui"
-
 // 初始化Render
-var render = &BootstrapAdminRender{
-	templateFs: templateFs,
-	fsPatterns: "templates/*.tmpl",
-}
+var render = &BootstrapAdminRender{}
+
+// DEV 开发模式，可以热加载模板，方便调试
+var DEV = true
 
 func init() {
 	// 加载模板
-	template, err := template.ParseFS(render.templateFs, render.fsPatterns)
+	template, err := template.ParseFS(templateFs, "templates/*.tmpl")
 	if err != nil {
 		panic(err)
 	}
 	render.template = template
 	// 注册渲染器
-	template2.AddRender(Name, render)
-}
-
-// SetTemplatePath 自定义模板路径
-// 执行这个操作将替换掉init中嵌入的模板
-func SetTemplatePath(path string) error {
-	// 创建新的fs
-	fs := os.DirFS(path)
-	// 加载模板
-	template, err := template.ParseFS(fs, "*.tmpl")
-	if err != nil {
-		return err
-	}
-	render.templateFs = fs
-	render.fsPatterns = "*.tmpl"
-	render.template = template
-	return nil
+	template2.AddRender("bootstrap_admin_ui", render)
 }
 
 // BootstrapAdminRender bootstrap-admin模板
 // https://www.bootstrap-admin.top/
 type BootstrapAdminRender struct {
-	templateFs fs.FS
-	template   *template.Template
-	fsPatterns string
+	template *template.Template
 }
 
 // LoadTemplate 加载模板
 func (r *BootstrapAdminRender) LoadTemplate() (*template.Template, error) {
-	if config.GetDebug().Enable {
-		return template.ParseFS(r.templateFs, r.fsPatterns)
+	if DEV {
+		// 获取绝对路径
+		_, file, _, _ := runtime.Caller(0)
+		fs := os.DirFS(filepath.Dir(file))
+		return template.ParseFS(fs, "templates/*.tmpl")
 	}
 	return r.template, nil
 }
@@ -73,7 +57,8 @@ func (r *BootstrapAdminRender) LoadTemplate() (*template.Template, error) {
 // LayoutPageRender 首页页面模板渲染
 func (r *BootstrapAdminRender) LayoutPageRender(req *http.Request) template.HTML {
 	// 编译模板内容
-	htmlStr, err := tools.ExecuteTemplateFile(r.template, "layout", nil)
+	template := template.Must(r.LoadTemplate())
+	htmlStr, err := tools.ExecuteTemplateFile(template, "layout", nil)
 	if err != nil {
 		return r.ErrorPageRender(err, req)
 	}

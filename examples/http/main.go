@@ -1,9 +1,10 @@
 package main
 
 import (
-	_ "github.com/hl540/model-admin/src/bootstrap_admin_ui"
 	"log"
 	"net/http"
+
+	_ "github.com/hl540/model-admin/src/bootstrap_admin_ui"
 
 	"github.com/hl540/model-admin/config"
 	modeladmin "github.com/hl540/model-admin/handler"
@@ -11,9 +12,6 @@ import (
 )
 
 func main() {
-	//if err := bootstrap_admin_ui.SetTemplatePath("../../tmpl"); err != nil {
-	//	log.Fatal(err)
-	//}
 	conf, err := config.LoadFromYaml("./conf.yaml")
 	if err != nil {
 		log.Fatal(err)
@@ -24,24 +22,6 @@ func main() {
 		log.Fatal(err)
 	}
 	http.ListenAndServe(":9696", handler)
-}
-
-var tableData = []map[string]any{
-	{
-		"name": "张三",
-		"age":  25,
-		"sex":  "男",
-	},
-	{
-		"name": "王五",
-		"age":  30,
-		"sex":  "女",
-	},
-	{
-		"name": "小明",
-		"age":  12,
-		"sex":  "男",
-	},
 }
 
 var models = map[string]any{
