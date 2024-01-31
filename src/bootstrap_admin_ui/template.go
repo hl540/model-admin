@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/Masterminds/sprig/v3"
 	"github.com/hl540/model-admin/config"
 	"github.com/hl540/model-admin/model_page/table"
 	template2 "github.com/hl540/model-admin/template"
@@ -28,11 +29,9 @@ var DEV = true
 
 func init() {
 	// 加载模板
-	template, err := template.ParseFS(templateFs, "templates/*.tmpl")
-	if err != nil {
+	if _, err := render.LoadTemplate(); err != nil {
 		panic(err)
 	}
-	render.template = template
 	// 注册渲染器
 	template2.AddRender("bootstrap_admin_ui", render)
 }
@@ -43,13 +42,19 @@ type BootstrapAdminRender struct {
 	template *template.Template
 }
 
+// 获取绝对路径
+var _, runtimeFile, _, _ = runtime.Caller(0)
+
 // LoadTemplate 加载模板
 func (r *BootstrapAdminRender) LoadTemplate() (*template.Template, error) {
+	if r.template == nil {
+		r.template = template.New("bootstrap_admin_ui").Funcs(sprig.FuncMap())
+		return r.template.ParseFS(templateFs, "templates/*.tmpl")
+	}
 	if DEV {
-		// 获取绝对路径
-		_, file, _, _ := runtime.Caller(0)
-		fs := os.DirFS(filepath.Dir(file))
-		return template.ParseFS(fs, "templates/*.tmpl")
+		fs := os.DirFS(filepath.Dir(runtimeFile))
+		tmpl := template.New("bootstrap_admin_ui").Funcs(sprig.FuncMap())
+		return tmpl.ParseFS(fs, "templates/*.tmpl")
 	}
 	return r.template, nil
 }
@@ -71,6 +76,8 @@ type TablePageTemplateData struct {
 	Columns          []map[string]any // 列
 	Data             []map[string]any // 数据
 	Count            int64            // 总数
+	Size             int              // 数量
+	Page             int              // 页码
 	FixedLeftNumber  int              // 左侧固定列数
 	FixedRightNumber int              // 右侧固定列数
 }
@@ -90,6 +97,8 @@ func (r *BootstrapAdminRender) TablePageRender(tableModel *table.Table, req *htt
 		Columns:          make([]map[string]any, 0, len(tableModel.GetColumns())),
 		Data:             make([]map[string]any, 0, len(data)),
 		Count:            count,
+		Size:             param.Pagination.Size,
+		Page:             param.Pagination.Page,
 		FixedLeftNumber:  tableModel.FixedLeftNumber,
 		FixedRightNumber: tableModel.FixedRightNumber,
 	}
