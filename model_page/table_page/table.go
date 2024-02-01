@@ -74,7 +74,7 @@ func (t *Table) Join(expression string) *Table {
 }
 
 // GetDataFn 格数据方法
-type GetDataFn func(param *GetDataParam) ([]map[string]any, int64, error)
+type GetDataFn func(param *QueryParam) ([]map[string]any, int64, error)
 
 // SetGetDataFn 设置自定义表格数据方法
 func (t *Table) SetGetDataFn(fn GetDataFn) *Table {

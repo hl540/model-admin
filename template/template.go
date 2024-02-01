@@ -1,52 +1,44 @@
 package template
 
 import (
-	"github.com/hl540/model-admin/model_page/table_page"
+	"fmt"
 	"html/template"
-	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/hl540/model-admin/config"
+	"github.com/hl540/model-admin/model_page/table_page"
 )
 
-// LayoutPageRender 首页页面模板渲染，它是界面的最外层，包裹其他页面
-func LayoutPageRender(req *http.Request) template.HTML {
-	render := GetRender(config.GetTemplateName())
-	return render.LayoutPageRender(req)
-}
-
-// TablePageRender 表格页面模板渲染
-func TablePageRender(tableModel *table_page.Table, req *http.Request) template.HTML {
-	render := GetRender(config.GetTemplateName())
-	return render.TablePageRender(tableModel, req)
-}
-
-// ErrorPageTemplate 错误页面模板渲染
-func ErrorPageTemplate(err error, req *http.Request) template.HTML {
-	render := GetRender(config.GetTemplateName())
-	return render.ErrorPageRender(err, req)
-}
-
 // 模板渲染器集合
-var templateRender = map[string]Render{}
+var templateSet = make(map[string]HTMLTemplateRender)
 
-// AddRender 设置一个模板渲染器
-func AddRender(name string, render Render) {
-	templateRender[name] = render
+// AddTemplate 新增一个模板
+func AddTemplate(name string, tmpl HTMLTemplateRender) {
+	templateSet[name] = tmpl
 }
 
-// GetRender 获取一个模板渲染器
-func GetRender(name string) Render {
-	return templateRender[name]
+// GetTemplate 获取一个模板
+func GetTemplate(name string) (HTMLTemplateRender, error) {
+	tmpl, ok := templateSet[name]
+	if !ok {
+		return nil, fmt.Errorf("the %s template does not exist", name)
+	}
+	return tmpl, nil
 }
 
-// Render 模板渲染器
-type Render interface {
-	// LoadTemplate 加载模板
-	LoadTemplate() (*template.Template, error)
-	// LayoutPageRender 首页页面模板渲染，它是界面的最外层，包裹其他页面
-	LayoutPageRender(req *http.Request) template.HTML
-	// TablePageRender 表格页面模板渲染
-	TablePageRender(tableModel *table_page.Table, req *http.Request) template.HTML
-	// ErrorPageRender 错误页面模板渲染
-	ErrorPageRender(err error, req *http.Request) template.HTML
+// GetDefaultTemplate 获取配置中的模板名称
+func GetDefaultTemplate() (HTMLTemplateRender, error) {
+	return GetTemplate(config.GetTemplateName())
+}
+
+// HTMLTemplateRender 模板渲染器
+type HTMLTemplateRender interface {
+	// GetTemplate 获取模板实例
+	GetTemplate() *template.Template
+	// GetTemplateFiles 获取区别模板文件名称
+	GetTemplateFiles() []string
+	// LayoutPageRender 首页渲染
+	LayoutPageRender(ctx *gin.Context)
+	// TablePageRender 表格页面渲染
+	TablePageRender(ctx *gin.Context, tableModel *table_page.Table, data *table_page.TableData)
 }

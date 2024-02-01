@@ -1,17 +1,31 @@
 package handler
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/hl540/model-admin/model_page/table_page"
+	"github.com/gin-gonic/gin"
+	"github.com/hl540/model-admin/model_page"
+	table2 "github.com/hl540/model-admin/model_page/table_page"
 	"github.com/hl540/model-admin/template"
-	"net/http"
 )
 
 // TablePageHandler 列表页面处理器
-func TablePageHandler(router *mux.Router, name string, table *table_page.Table) {
-	// 列表路由处理器
-	router.Path("/" + name + "/list").HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-		tmpl := template.TablePageRender(table, request)
-		writer.Write([]byte(tmpl))
-	}).Methods("GET")
+func TablePageHandler() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// 获取model_table
+		table, err := model_page.GetTable(ctx.Param("mode_name"))
+		if err != nil {
+			ctx.String(500, err.Error())
+			return
+		}
+		result, err := table.GetData(table2.ParseQueryParam(ctx))
+		if err != nil {
+			ctx.String(500, err.Error())
+			return
+		}
+		tmpl, err := template.GetDefaultTemplate()
+		if err != nil {
+			ctx.String(500, err.Error())
+			return
+		}
+		tmpl.TablePageRender(ctx, table, result)
+	}
 }

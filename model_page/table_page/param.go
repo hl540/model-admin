@@ -1,69 +1,70 @@
 package table_page
 
 import (
-	"net/http"
-	"strconv"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 )
 
-const PaginationSize = 10     // 单页默认数量
-const PaginationSizeMax = 100 // 单页最大数量
-const PaginationPage = 1      // 默认页码
+const DefaultSize = 10 // 单页默认数量
+const SizeMax = 100    // 单页最大数量
+const DefaultPage = 1  // 默认页码
 
-// Pagination 分页参数
-type Pagination struct {
-	Size int // 数量
-	Page int // 页码
-}
-
-// NewPagination 创建分页参数
-func NewPagination(page int, size int) *Pagination {
+// pagination 解析分页参数
+func pagination(page int, size int) (int, int) {
 	if page <= 0 {
-		page = PaginationPage
+		page = DefaultPage
 	}
 	if size <= 0 {
-		size = PaginationSize
+		size = DefaultSize
 	}
-	if size > PaginationSizeMax {
-		size = PaginationSizeMax
+	if size > SizeMax {
+		size = SizeMax
 	}
-	return &Pagination{
-		Size: size,
-		Page: page,
-	}
+	return page, size
 }
 
-type GetDataParam struct {
-	Filter     map[string]any // 筛选参数
-	Sort       []string       // 排序参数
-	Pagination *Pagination    // 分页参数
-	Req        *http.Request
+// 解析排序参数
+func sort(sortStr string) []string {
+	if len(sortStr) == 0 {
+		return nil
+	}
+	sortArr := strings.Split(sortStr, ".")
+	if len(sortArr) == 1 {
+		return append(sortArr, "DESC")
+	}
+	if sortArr[1] != "DESC" && sortArr[1] != "ASC" {
+		sortArr[1] = "DESC"
+	}
+	return sortArr
 }
 
-func ParseGetDataParam(req *http.Request) *GetDataParam {
-	param := &GetDataParam{
-		Req:    req,
+// QueryParam 表格数据查询参数
+type QueryParam struct {
+	Filter map[string]any // 筛选参数
+	Sort   []string       // 排序参数
+	Page   int            // 数量
+	Size   int            // 页码
+}
+
+// ParseQueryParam 解析查询参数
+func ParseQueryParam(ctx *gin.Context) *QueryParam {
+	param := &QueryParam{
 		Filter: make(map[string]any),
 	}
-	query := req.URL.Query()
 	// 解析分页参数
-	page, _ := strconv.ParseInt(query.Get("_page"), 10, 64)
-	size, _ := strconv.ParseInt(query.Get("_size"), 10, 64)
-	param.Pagination = NewPagination(int(page), int(size))
+	page := cast.ToInt(ctx.Query("_page"))
+	size := cast.ToInt(ctx.Query("_size"))
+	param.Page, param.Size = pagination(page, size)
 
 	// 解析排序参数
-	sort := query.Get("_sort")
-	if sort != "" {
-		param.Sort = strings.Split(sort, ".")
-		if len(param.Sort) == 1 {
-			param.Sort = append(param.Sort, "DESC")
-		}
-	}
+	param.Sort = sort(ctx.Query("_sort"))
 
 	// 解析筛选参数
-	for k := range query {
+	for k := range ctx.Request.URL.Query() {
 		if len(k) > 8 && k[:8] == "_filter_" {
-			param.Filter[k[8:]] = query.Get(k)
+			param.Filter[k[8:]] = ctx.Query(k)
 		}
 	}
 	return param

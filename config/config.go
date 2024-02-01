@@ -26,6 +26,7 @@ type Debug struct {
 type Config struct {
 	RouterPrefix string               `yaml:"router_prefix"` // 路由前缀
 	TemplateName string               `yaml:"template_name"` // 模板名称
+	TemplatePath string               `yaml:"template_path"` // 模板路径
 	ServerListen string               `yaml:"server_listen"` // http服务配置
 	Databases    map[string]*Database `yaml:"databases"`     // db配置
 	Debug        *Debug               `yaml:"debug"`         // 调试模式

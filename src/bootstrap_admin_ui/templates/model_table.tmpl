@@ -1,160 +1,158 @@
-{{define "model_table" }}
-	<!doctype html>
-	<html lang="zh">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-		<link rel="icon" href="https://cdn.jsdelivr.net/npm/bootstrap-admin/dist/img/favicon-32x32.png" sizes="32x32"
-			  type="image/png">
-		<link rel="icon" href="https://cdn.jsdelivr.net/npm/bootstrap-admin/dist/img/favicon-16x16.png" sizes="16x16"
-			  type="image/png">
-		<meta name="keywords" content="响应式后台模板,开源免费后台模板,Bootstrap5后台管理系统模板">
-		<meta name="description" content="bootstrap-admin基于bootstrap5的免费开源的响应式后台管理模板">
-		<meta name="author" content="ajiho">
-		<link rel="stylesheet"
-			  href="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-icons/font/bootstrap-icons.min.css">
-		<link rel="stylesheet"
-			  href="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap/dist/css/bootstrap.min.css">
-		<link rel="stylesheet"
-			  href="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-table/dist/bootstrap-table.min.css">
-		<link rel="stylesheet"
-			  href="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-table/dist/extensions/fixed-columns/bootstrap-table-fixed-columns.min.css">
-		<link rel="stylesheet"
-			  href="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/@eonasdan/tempus-dominus/dist/css/tempus-dominus.min.css"/>
-		<link rel="stylesheet"
-			  href="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-select/dist/css/bootstrap-select.min.css">
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-admin/dist/css/bootstrap-admin.min.css">
-		<title>bootstrap-admin开源免费响应式后台管理系统模板</title>
-	</head>
-	<body class="bg-body-tertiary py-3">
+<!doctype html>
+<html lang="zh">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	<link rel="icon" href="https://cdn.jsdelivr.net/npm/bootstrap-admin/dist/img/favicon-32x32.png" sizes="32x32"
+		  type="image/png">
+	<link rel="icon" href="https://cdn.jsdelivr.net/npm/bootstrap-admin/dist/img/favicon-16x16.png" sizes="16x16"
+		  type="image/png">
+	<meta name="keywords" content="响应式后台模板,开源免费后台模板,Bootstrap5后台管理系统模板">
+	<meta name="description" content="bootstrap-admin基于bootstrap5的免费开源的响应式后台管理模板">
+	<meta name="author" content="ajiho">
+	<link rel="stylesheet"
+		  href="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-icons/font/bootstrap-icons.min.css">
+	<link rel="stylesheet"
+		  href="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet"
+		  href="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-table/dist/bootstrap-table.min.css">
+	<link rel="stylesheet"
+		  href="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-table/dist/extensions/fixed-columns/bootstrap-table-fixed-columns.min.css">
+	<link rel="stylesheet"
+		  href="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/@eonasdan/tempus-dominus/dist/css/tempus-dominus.min.css"/>
+	<link rel="stylesheet"
+		  href="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-select/dist/css/bootstrap-select.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-admin/dist/css/bootstrap-admin.min.css">
+	<title>bootstrap-admin开源免费响应式后台管理系统模板</title>
+</head>
+<body class="bg-body-tertiary py-3">
 
-	<div class="container-fluid">
-		<div class="card border-0 shadow-sm">
-			<!-- 筛选区域 -->
-            {{template "filter_area"}}
-			<!-- 表格区域 -->
-			<div class="card-body">
-				<!--  表格上方左侧的工具条区域    -->
-                {{template "table_action_area"}}
-				<!--  数据表格    -->
-				<table id="table"
-					   data-pagination="true"
-					   data-side-pagination="server"
-					   data-total-rows="{{.Count}}"
-					   data-page-number="{{.Page}}"
-					   data-page-size="{{.Size}}"
-					   data-pagination-successively-size="5"
-					   data-page-list="[5, 10, 25, 50, 100]"
-					   data-locale="zh-CN"
-					   data-search="true"
-				></table>
-			</div>
+<div class="container-fluid">
+	<div class="card border-0 shadow-sm">
+		<!-- 筛选区域 -->
+        {{template "filter_area"}}
+		<!-- 表格区域 -->
+		<div class="card-body">
+			<!--  表格上方左侧的工具条区域    -->
+            {{template "table_action_area"}}
+			<!--  数据表格    -->
+			<table id="table"
+				   data-pagination="true"
+				   data-side-pagination="server"
+				   data-total-rows="{{.Count}}"
+				   data-page-number="{{.Page}}"
+				   data-page-size="{{.Size}}"
+				   data-pagination-successively-size="5"
+				   data-page-list="[5, 10, 25, 50, 100]"
+				   data-locale="zh-CN"
+				   data-search="true"
+			></table>
 		</div>
 	</div>
-	<!--回到顶部开始-->
-	<a href="javaScript:" class="bsa-back-to-top"><i class='bi bi-arrow-up-short'></i></a>
-	<!--回到顶部结束-->
+</div>
+<!--回到顶部开始-->
+<a href="javaScript:" class="bsa-back-to-top"><i class='bi bi-arrow-up-short'></i></a>
+<!--回到顶部结束-->
 
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/jquery/dist/jquery.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/@popperjs/core/dist/umd/popper.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/@eonasdan/tempus-dominus/dist/js/tempus-dominus.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-table/dist/bootstrap-table.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-table/dist/extensions/fixed-columns/bootstrap-table-fixed-columns.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-select/dist/js/i18n/defaults-zh_CN.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/dist/js/bootstrap-admin.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/dist/js/app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/@popperjs/core/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/@eonasdan/tempus-dominus/dist/js/tempus-dominus.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-table/dist/bootstrap-table.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-table/dist/extensions/fixed-columns/bootstrap-table-fixed-columns.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/lib/bootstrap-select/dist/js/i18n/defaults-zh_CN.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/dist/js/bootstrap-admin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-admin/dist/js/app.js"></script>
 
-	<script>
-        // 列配置
-        const Columns = {{.Columns}};
-        const Data = {{.Data}};
-        const Count = {{.Count}};
-        $(document).ready(function (e) {
-            $('#table').bootstrapTable({
-                // 列
-                columns: [...Columns, {
-                    title: '操作',
-                    align: 'center',
-                    events: {
-                        'click .edit-btn': function (event, value, row, index) {
-                        },
-                        'click .del-btn': function (event, value, row, index) {
-                        },
-                        'click .role-btn': function (event, value, row, index) {
-                        },
-                    }
-                }],
-                // 数据
-                data: Data,
-                //固定列功能开启
-                fixedColumns: true,
-                //左侧固定列数
-                fixedNumber: {{.FixedLeftNumber}},
-                //右侧固定列数
-                fixedRightNumber: {{.FixedRightNumber}},
+<script>
+    // 列配置
+    const Columns = {{.Columns}};
+    const Data = {{.Data}};
+    const Count = {{.Count}};
+    $(document).ready(function (e) {
+        $('#table').bootstrapTable({
+            // 列
+            columns: [...Columns, {
+                title: '操作',
+                align: 'center',
+                events: {
+                    'click .edit-btn': function (event, value, row, index) {
+                    },
+                    'click .del-btn': function (event, value, row, index) {
+                    },
+                    'click .role-btn': function (event, value, row, index) {
+                    },
+                }
+            }],
+            // 数据
+            data: Data,
+            //固定列功能开启
+            fixedColumns: true,
+            //左侧固定列数
+            fixedNumber: {{.FixedLeftNumber}},
+            //右侧固定列数
+            fixedRightNumber: {{.FixedRightNumber}},
 
 
-                // 唯一ID字段
-                uniqueId: 'id',
-                // 每行的唯一标识字段
-                idField: 'id',
-                // 是否启用点击选中行
-                clickToSelect: true,
-                // 是否显示详细视图和列表视图的切换按钮
-                showToggle: true,
-                // 工具按钮容器
-                toolbar: '#toolbar',
-                // 是否显示所有的列
-                showColumns: true,
-                // 是否显示刷新按钮
-                showRefresh: true,
-                // 显示图标
-                showButtonIcons: true,
-                // 显示文本
-                showButtonText: false,
-                // 显示全屏
-                showFullscreen: true,
-                // 总数字段
-                totalField: 'total',
-                // 当字段为 undefined 显示
-                undefinedText: '-',
-                // 排序方式
-                sortOrder: "asc",
+            // 唯一ID字段
+            uniqueId: 'id',
+            // 每行的唯一标识字段
+            idField: 'id',
+            // 是否启用点击选中行
+            clickToSelect: true,
+            // 是否显示详细视图和列表视图的切换按钮
+            showToggle: true,
+            // 工具按钮容器
+            toolbar: '#toolbar',
+            // 是否显示所有的列
+            showColumns: true,
+            // 是否显示刷新按钮
+            showRefresh: true,
+            // 显示图标
+            showButtonIcons: true,
+            // 显示文本
+            showButtonText: false,
+            // 显示全屏
+            showFullscreen: true,
+            // 总数字段
+            totalField: 'total',
+            // 当字段为 undefined 显示
+            undefinedText: '-',
+            // 排序方式
+            sortOrder: "asc",
 
-                // 按钮的类
-                buttonsClass: 'light',
-                // 类名前缀
-                buttonsPrefix: 'btn',
+            // 按钮的类
+            buttonsClass: 'light',
+            // 类名前缀
+            buttonsPrefix: 'btn',
 
-                // 图标前缀
-                iconsPrefix: 'bi',
-                // 图标大小 undefined sm lg
-                iconSize: undefined,
-                // 图标的设置  这里只做了一个演示，可设置项目参考 https://examples.bootstrap-table.com/#options/table-icons.html
-                icons: {
-                    fullscreen: 'bi-arrows-fullscreen',
-                },
-            });
-            // 刷新
-            $('#table').on('refresh.bs.table', function (event) {
-                location.reload();
-            });
-            // 切换分页
-            $('#table').on('page-change.bs.table', function (event, number, size) {
-                let url = new URL(location.href)
-                url.searchParams.set("_page", number);
-                url.searchParams.set("_size", size);
-                location.href = url.toString();
-            });
+            // 图标前缀
+            iconsPrefix: 'bi',
+            // 图标大小 undefined sm lg
+            iconSize: undefined,
+            // 图标的设置  这里只做了一个演示，可设置项目参考 https://examples.bootstrap-table.com/#options/table-icons.html
+            icons: {
+                fullscreen: 'bi-arrows-fullscreen',
+            },
         });
-	</script>
+        // 刷新
+        $('#table').on('refresh.bs.table', function (event) {
+            location.reload();
+        });
+        // 切换分页
+        $('#table').on('page-change.bs.table', function (event, number, size) {
+            let url = new URL(location.href)
+            url.searchParams.set("_page", number);
+            url.searchParams.set("_size", size);
+            location.href = url.toString();
+        });
+    });
+</script>
 
-	</body>
-	</html>
-{{end}}
+</body>
+</html>
 
 <!-- 筛选区域 -->
 {{define "filter_area"}}

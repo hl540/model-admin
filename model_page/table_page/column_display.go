@@ -5,7 +5,7 @@ import (
 	"html/template"
 	url2 "net/url"
 
-	"github.com/hl540/model-admin/tools"
+	"github.com/hl540/model-admin/utils"
 	"github.com/spf13/cast"
 )
 
@@ -19,7 +19,7 @@ func (c *Column) DisplayImage(width, height int) {
 	}
 	c.SetDisplayFn(func(value map[string]any) template.HTML {
 		text := `<img src="{{.src}}" alt="{{.alt}}" width="{{.width}}px" height="{{.height}}px">`
-		return tools.ExecuteTemplateString("ColumnDisplayImage", text, map[string]any{
+		return utils.ExecuteTemplateString("ColumnDisplayImage", text, map[string]any{
 			"src":    cast.ToString(value[c.Name]),
 			"alt":    value[c.Name],
 			"width":  width,

@@ -4,21 +4,35 @@ import (
 	"github.com/hl540/model-admin/data_source"
 )
 
-// GetTmplData 获取表格模板数据
-func (t *Table) GetTmplData(param *GetDataParam) ([]map[string]*ColumnValue, int64, error) {
-	// 加载数据
-	data, count, err := t.GetData(param)
-	if err != nil {
-		return nil, 0, err
-	}
-	return t.parseData(data), count, nil
+// TableData 模型表格查询结果
+type TableData struct {
+	Rows  []map[string]any // 数据行
+	Count int64            // 总数
+	Size  int              // 数量
+	Page  int              // 页码
 }
 
-// GetData 获取表格数据
-func (t *Table) GetData(param *GetDataParam) ([]map[string]any, int64, error) {
-	if t.customGetDataFn != nil {
-		return t.customGetDataFn(param)
+// GetData 获取表格模板数据
+func (t *Table) GetData(param *QueryParam) (*TableData, error) {
+	var result = &TableData{
+		Page: param.Page,
+		Size: param.Size,
 	}
+	var err error
+	// 加载数据
+	if t.customGetDataFn != nil { // 自定义数据源
+		result.Rows, result.Count, err = t.customGetDataFn(param)
+	} else { // db数据
+		result.Rows, result.Count, err = t.GetDBData(param)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// GetDBData 从数据库获取数据
+func (t *Table) GetDBData(param *QueryParam) ([]map[string]any, int64, error) {
 	// 获取数据源
 	if t.dataSource == "" {
 		t.dataSource = "default"
@@ -52,8 +66,8 @@ func (t *Table) GetData(param *GetDataParam) ([]map[string]any, int64, error) {
 		query.Order(param.Sort[0] + " " + param.Sort[1])
 	}
 	// 分页
-	query.Offset((param.Pagination.Page - 1) * param.Pagination.Size)
-	query.Limit(param.Pagination.Size)
+	query.Offset((param.Page - 1) * param.Size)
+	query.Limit(param.Size)
 	// 查询列
 	query.Select(t.parseQueryColumnName())
 	// 解析数据
@@ -75,19 +89,4 @@ func (t *Table) parseQueryColumnName() []string {
 		}
 	}
 	return columnNames
-}
-
-// 解析表格数据
-func (t *Table) parseData(data []map[string]any) (result []map[string]*ColumnValue) {
-	for _, row := range data {
-		value := make(map[string]*ColumnValue)
-		for _, col := range t.Columns {
-			value[col.Name] = &ColumnValue{
-				RowValue:    row[col.Name],
-				DisplayText: col.ExecuteDisplay(row),
-			}
-		}
-		result = append(result, value)
-	}
-	return result
 }
