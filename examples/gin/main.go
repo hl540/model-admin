@@ -36,19 +36,19 @@ func main() {
 type UserModel struct{}
 
 func (u *UserModel) Table() *table2.Table {
-	table := new(table2.Table)
-	table.Join("LEFT JOIN role ON user.role_id = role.id")
-	table.AddColumn("id", "ID").SetPrimary().DisplayLink("https://www.baidu.com?wd={id}", "_blank")
+	table := table2.NewTable("user")
+	table.SetTitle("用户列表")
+	table.AddColumn("id", "ID").SetPrimary().SetFormat(table2.LinkFormat)
 	table.AddColumn("name", "名称")
 	table.AddColumn("age", "年龄").SetHide()
 	table.AddColumn("sex", "性别").SetValueMap(map[string]any{
 		"1": "男",
 		"0": "女",
 	})
-	table.AddColumn("shot", "头像").DisplayImage(30, 30)
+	table.AddColumn("shot", "头像").SetFormat(table2.ImageFormat)
+	table.Join("LEFT JOIN role ON user.role_id = role.id")
 	table.AddColumn("role_name", "所属组").JoinName("role.name")
 	table.AddColumn("created_at", "创建时间").DisplayDateTime("2006-01-02 15:04:05")
-	table.SetTableName("user").SetTitle("用户列表").SetFixedNumber(2, 1)
 	return table
 }
 
@@ -56,9 +56,9 @@ type RoleModel struct {
 }
 
 func (r *RoleModel) Table() *table2.Table {
-	table := new(table2.Table)
+	table := table2.NewTable("role")
+	table.SetTitle("角色列表")
 	table.AddColumn("id", "ID").SetPrimary()
 	table.AddColumn("name", "名称")
-	table.SetTableName("role").SetTitle("角色列表")
 	return table
 }

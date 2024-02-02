@@ -104,9 +104,10 @@ func (b *BootstrapAdminUI) TablePageRender(ctx *gin.Context, tableModel *table_p
 			"title":      col.Title,
 			"field":      col.Name,
 			"align":      "center",
-			"switchable": !col.Primary,
+			"switchable": col.Primary,
 			"visible":    !col.Hide, // 是否显示该列
+			"formatter":  col.Format,
 		})
 	}
-	ctx.HTML(http.StatusOK, "model_table.tmpl", tmplData)
+	ctx.HTML(http.StatusOK, "model_table_new.tmpl", tmplData)
 }

@@ -29,3 +29,21 @@ func TablePageHandler() gin.HandlerFunc {
 		tmpl.TablePageRender(ctx, table, result)
 	}
 }
+
+// TablePageHandlerPost 列表页面处理器
+func TablePageHandlerPost() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// 获取model_table
+		table, err := model_page.GetTable(ctx.Param("mode_name"))
+		if err != nil {
+			ctx.String(500, err.Error())
+			return
+		}
+		result, err := table.GetData(table2.ParseQueryParam(ctx))
+		if err != nil {
+			ctx.String(500, err.Error())
+			return
+		}
+		ctx.JSON(200, result)
+	}
+}

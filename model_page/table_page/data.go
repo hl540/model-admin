@@ -17,7 +17,13 @@ func (t *Table) GetData(param *QueryParam) (*TableData, error) {
 	var result = &TableData{
 		Page: param.Page,
 		Size: param.Size,
+		Rows: make([]map[string]any, 0),
 	}
+	// 请求模板的时候是否加载数据
+	if t.loadTemplateData == false {
+		return result, nil
+	}
+
 	var err error
 	// 加载数据
 	if t.customGetDataFn != nil { // 自定义数据源

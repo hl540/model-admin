@@ -58,6 +58,7 @@ func (a *Admin) initRouter() {
 	adminRouter.GET("/", handler.AdminPageHandler())
 	// 模型列表页面路由
 	adminRouter.GET("/model/:mode_name/table", handler.TablePageHandler())
+	adminRouter.POST("/model/:mode_name/table", handler.TablePageHandlerPost())
 	// 模型详情页面路由
 	adminRouter.GET("/model/:mode_name/detail", handler.DetailPageHandler())
 	// 模型新增路由

@@ -10,6 +10,7 @@ type Table struct {
 	columnMap        map[string]*Column // 所有列
 	FixedLeftNumber  int                // 左侧固定列数
 	FixedRightNumber int                // 右侧固定列数
+	loadTemplateData bool               // 请求模板的时候是否加载数据
 
 	// 数据源配置
 	tableName       string       // 数据表名称
@@ -17,6 +18,16 @@ type Table struct {
 	joins           []string     // 连表条件，可以有多个
 	customGetDataFn GetDataFn    // 自定义数据获取方法
 	dataFilterFn    DataFilterFn // 数据过滤方法
+}
+
+func NewTable(tableName string) *Table {
+	return &Table{
+		FixedLeftNumber:  2,
+		FixedRightNumber: 1,
+		loadTemplateData: true,
+		tableName:        tableName,
+		dataSource:       "default",
+	}
 }
 
 // SetTitle 设置表格title
@@ -52,6 +63,12 @@ func (t *Table) SetFixedNumber(number ...int) *Table {
 	if len(number) >= 2 {
 		t.FixedRightNumber = number[1]
 	}
+	return t
+}
+
+// SetLoadData 是否加载模板数据
+func (t *Table) SetLoadData(b bool) *Table {
+	t.loadTemplateData = b
 	return t
 }
 

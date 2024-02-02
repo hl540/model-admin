@@ -6,12 +6,21 @@ import (
 	"github.com/spf13/cast"
 )
 
+type FormatName string
+
+// ImageFormat 图片格式
+const ImageFormat FormatName = "imageFormatter"
+
+// LinkFormat 链接格式
+const LinkFormat FormatName = "linkFormatter"
+
 // Column 表格列
 type Column struct {
 	Title       string            // 列展示名称
 	Name        string            // 列字段名称
 	Primary     bool              // 主键字段，标记唯一
 	Hide        bool              // 是否隐藏
+	Format      FormatName        // 内容格式化名称
 	displayFns  []ColumnDisplayFn // 列值展示方法
 	valueMap    map[string]any    // 列值映射
 	displayHtml template.HTML     // display内容
@@ -30,6 +39,12 @@ func (c *Column) SetPrimary() *Column {
 // SetHide 设置列隐藏
 func (c *Column) SetHide() *Column {
 	c.Hide = true
+	return c
+}
+
+// SetFormat 设置格式化
+func (c *Column) SetFormat(name FormatName) *Column {
+	c.Format = name
 	return c
 }
 
