@@ -2,10 +2,6 @@ package model_page
 
 import (
 	"fmt"
-
-	"github.com/hl540/model-admin/model_page/detail_page"
-	"github.com/hl540/model-admin/model_page/form_page"
-	"github.com/hl540/model-admin/model_page/table_page"
 )
 
 // modelPage集合
@@ -17,7 +13,7 @@ func Register(name string, modelPage any) {
 }
 
 // GetTable 获取ModelTablePage的实现
-func GetTable(name string) (*table_page.Table, error) {
+func GetTable(name string) (*Table, error) {
 	modelPage, ok := modelPageSet[name]
 	if !ok {
 		return nil, fmt.Errorf("%s does not exist", name)
@@ -30,7 +26,7 @@ func GetTable(name string) (*table_page.Table, error) {
 }
 
 // GetDetail 获取ModelDetailPage的实现
-func GetDetail(name string) (*detail_page.Field, error) {
+func GetDetail(name string) (*Field, error) {
 	modelPage, ok := modelPageSet[name]
 	if !ok {
 		return nil, fmt.Errorf("%s does not exist", name)
@@ -43,7 +39,7 @@ func GetDetail(name string) (*detail_page.Field, error) {
 }
 
 // GetEdit 获取ModelEditPage的实现
-func GetEdit(name string) (*form_page.Form, error) {
+func GetEdit(name string) (*Form, error) {
 	modelPage, ok := modelPageSet[name]
 	if !ok {
 		return nil, fmt.Errorf("%s does not exist", name)
@@ -56,7 +52,7 @@ func GetEdit(name string) (*form_page.Form, error) {
 }
 
 // GetNew 获取ModelNewPage的实现
-func GetNew(name string) (*form_page.Form, error) {
+func GetNew(name string) (*Form, error) {
 	modelPage, ok := modelPageSet[name]
 	if !ok {
 		return nil, fmt.Errorf("%s does not exist", name)
@@ -70,20 +66,20 @@ func GetNew(name string) (*form_page.Form, error) {
 
 // ModelTablePage 模型表格页面
 type ModelTablePage interface {
-	Table() *table_page.Table
+	Table() *Table
 }
 
 // ModelDetailPage 模型详情页面
 type ModelDetailPage interface {
-	Detail() *detail_page.Field
+	Detail() *Field
 }
 
 // ModelEditPage 模型新增页面
 type ModelEditPage interface {
-	Edit() *form_page.Form
+	Edit() *Form
 }
 
 // ModelNewPage 模型编辑页面
 type ModelNewPage interface {
-	New() *form_page.Form
+	New() *Form
 }

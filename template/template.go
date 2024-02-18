@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/hl540/model-admin/config"
-	"github.com/hl540/model-admin/model_page/table_page"
+	"github.com/hl540/model-admin/model_page"
 )
 
 // 模板渲染器集合
@@ -40,5 +40,5 @@ type HTMLTemplateRender interface {
 	// LayoutPageRender 首页渲染
 	LayoutPageRender(ctx *gin.Context)
 	// TablePageRender 表格页面渲染
-	TablePageRender(ctx *gin.Context, tableModel *table_page.Table, data *table_page.TableData)
+	TablePageRender(ctx *gin.Context, tableModel *model_page.Table, data *model_page.TableData)
 }

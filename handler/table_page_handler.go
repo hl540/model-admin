@@ -3,7 +3,6 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hl540/model-admin/model_page"
-	table2 "github.com/hl540/model-admin/model_page/table_page"
 	"github.com/hl540/model-admin/template"
 )
 
@@ -16,7 +15,7 @@ func TablePageHandler() gin.HandlerFunc {
 			ctx.String(500, err.Error())
 			return
 		}
-		result, err := table.GetData(table2.ParseQueryParam(ctx))
+		result, err := table.GetData(model_page.ParseQueryParam(ctx))
 		if err != nil {
 			ctx.String(500, err.Error())
 			return
@@ -39,7 +38,7 @@ func TablePageHandlerPost() gin.HandlerFunc {
 			ctx.String(500, err.Error())
 			return
 		}
-		result, err := table.GetData(table2.ParseQueryParam(ctx))
+		result, err := table.GetData(model_page.ParseQueryParam(ctx))
 		if err != nil {
 			ctx.String(500, err.Error())
 			return

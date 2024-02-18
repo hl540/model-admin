@@ -1,4 +1,4 @@
-package detail_page
+package model_page
 
 type Field struct {
 }

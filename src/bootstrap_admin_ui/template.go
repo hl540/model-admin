@@ -8,7 +8,7 @@ import (
 	"runtime"
 
 	"github.com/gin-gonic/gin"
-	"github.com/hl540/model-admin/model_page/table_page"
+	"github.com/hl540/model-admin/model_page"
 	template2 "github.com/hl540/model-admin/template"
 	"github.com/hl540/model-admin/utils"
 )
@@ -91,7 +91,7 @@ type TablePageTemplateData struct {
 }
 
 // TablePageRender 表格页面渲染
-func (b *BootstrapAdminUI) TablePageRender(ctx *gin.Context, tableModel *table_page.Table, tableData *table_page.TableData) {
+func (b *BootstrapAdminUI) TablePageRender(ctx *gin.Context, tableModel *model_page.Table, tableData *model_page.TableData) {
 	tmplData := TablePageTemplateData{
 		Title:            tableModel.Title,
 		Columns:          make([]map[string]any, 0, len(tableModel.GetColumns())),
@@ -110,9 +110,9 @@ func (b *BootstrapAdminUI) TablePageRender(ctx *gin.Context, tableModel *table_p
 			"title":     col.Title,
 			"field":     col.Name,
 			"align":     "center",
-			"visible":   !col.Hide, // 是否显示该列
-			"formatter": col.ShowFormat,
-			"sortable":  col.SortAble,
+			"visible":   !col.IsHide, // 是否显示该列
+			"formatter": col.ShowFormatName,
+			"sortable":  col.IsSort,
 		})
 	}
 	ctx.HTML(http.StatusOK, "model_table_new.tmpl", tmplData)

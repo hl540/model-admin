@@ -1,4 +1,4 @@
-package form_page
+package model_page
 
 type Form struct {
 }
