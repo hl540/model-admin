@@ -6,35 +6,29 @@ import (
 	"github.com/spf13/cast"
 )
 
-type FormatName string
+type ShowFormatName string
 
 // ImageFormat 图片格式
-const ImageFormat FormatName = "imageFormatter"
+const ImageFormat ShowFormatName = "imageFormatter"
 
 // LinkFormat 链接格式
-const LinkFormat FormatName = "linkFormatter"
+const LinkFormat ShowFormatName = "linkFormatter"
 
 // Column 表格列
 type Column struct {
-	Title       string            // 列展示名称
-	Name        string            // 列字段名称
-	Primary     bool              // 主键字段，标记唯一
-	Hide        bool              // 是否隐藏
-	Format      FormatName        // 内容格式化名称
-	displayFns  []ColumnDisplayFn // 列值展示方法
-	valueMap    map[string]any    // 列值映射
-	displayHtml template.HTML     // display内容
-	joinName    string            // join名称
+	Title         string              // 列展示名称
+	Name          string              // 列字段名称
+	Hide          bool                // 是否隐藏
+	SortAble      bool                // 可以排序
+	ShowFormat    ShowFormatName      // 内容展示格式化名称
+	valueFormatFn ColumnValueFormatFn // 值格式化方法
+	valueMap      map[string]any      // 列值映射
+	displayHtml   template.HTML       // display内容
+	joinName      string              // join名称
 }
 
-// ColumnDisplayFn 列值展示方法
-type ColumnDisplayFn func(value map[string]any) template.HTML
-
-// SetPrimary 标记为主键字段
-func (c *Column) SetPrimary() *Column {
-	c.Primary = true
-	return c
-}
+// ColumnValueFormatFn 列值格式化方法
+type ColumnValueFormatFn func(value map[string]any) any
 
 // SetHide 设置列隐藏
 func (c *Column) SetHide() *Column {
@@ -42,38 +36,28 @@ func (c *Column) SetHide() *Column {
 	return c
 }
 
-// SetFormat 设置格式化
-func (c *Column) SetFormat(name FormatName) *Column {
-	c.Format = name
+// SetSort 设置可以排序
+func (c *Column) SetSort() *Column {
+	c.SortAble = true
 	return c
 }
 
-// SetDisplayFn 设置列值展示方法
-func (c *Column) SetDisplayFn(fn ColumnDisplayFn) {
-	c.displayFns = append(c.displayFns, fn)
+// SetShowFormatName 设置列值展示格式化方法名称
+func (c *Column) SetShowFormatName(name ShowFormatName) *Column {
+	c.ShowFormat = name
+	return c
+}
+
+// SetValueFormatFn 设置列值格式化方法
+func (c *Column) SetValueFormatFn(fn ColumnValueFormatFn) *Column {
+	c.valueFormatFn = fn
+	return c
 }
 
 // SetValueMap 设置列值映射
 func (c *Column) SetValueMap(vm map[string]any) *Column {
 	c.valueMap = vm
 	return c
-}
-
-// ExecuteDisplay 执行display获取列最终显示
-func (c *Column) ExecuteDisplay(rowValue map[string]any) template.HTML {
-	// 获取当前字段的值
-	currentColValue := cast.ToString(rowValue[c.Name])
-	// 执行值映射
-	if nweValue, ok := c.valueMap[currentColValue]; ok {
-		rowValue[c.Name] = nweValue
-	}
-	// 初始化展示内容
-	c.displayHtml = template.HTML(cast.ToString(rowValue[c.Name]))
-	// 执行display方法获取列的展示内容
-	for _, displayFn := range c.displayFns {
-		c.displayHtml = displayFn(rowValue)
-	}
-	return c.displayHtml
 }
 
 // JoinName join名称
@@ -88,10 +72,34 @@ type ColumnValue struct {
 	DisplayText template.HTML // 展示内容
 }
 
-// ParseColumnValue 解析列值
-func ParseColumnValue(col *Column, value any) *ColumnValue {
-	return &ColumnValue{
-		RowValue:    value,
-		DisplayText: "",
+// ParseValue 解析列值
+func (c *Column) ParseValue(rowValue map[string]any) any {
+	newValue := rowValue[c.Name]
+	// 执行值映射
+	if c.valueMap != nil {
+		currentColValue := cast.ToString(rowValue[c.Name])
+		if _, ok := c.valueMap[currentColValue]; ok {
+			newValue = c.valueMap[currentColValue]
+		}
 	}
+	// 执行格式化
+	if c.valueFormatFn != nil {
+		newValue = c.valueFormatFn(rowValue)
+	}
+	return newValue
+}
+
+/***********************************************************************/
+
+// FormatDateTime 展示为日期
+func (c *Column) FormatDateTime(layout string) *Column {
+	c.SetValueFormatFn(func(value map[string]any) any {
+		valueStr := cast.ToString(value[c.Name])
+		time, err := cast.StringToDate(valueStr)
+		if err != nil {
+			return template.HTML(err.Error())
+		}
+		return time.Format(layout)
+	})
+	return c
 }

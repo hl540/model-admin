@@ -38,8 +38,8 @@
 			<!--  数据表格    -->
 			<table id="table"
 				   data-toggle="table"
-				   data-id-field="id"
-				   data-unique-id="id"
+				   data-id-field="{{.PrimaryColumn}}"
+				   data-unique-id="{{.PrimaryColumn}}"
 				   data-buttons-class="light"
 				   data-show-refresh="true"
 				   data-show-toggle="true"
@@ -55,6 +55,9 @@
 				   data-page-size="{{.Size}}"
 				   data-pagination-successively-size="5"
 				   data-page-list="[2, 5, 10, 25, 50, 100]"
+				   data-sort-reset="true"
+				   data-sort-name="{{.SortName}}"
+				   data-sort-order="{{.SortOrder}}"
 				   data-locale="zh-CN"
 				   data-toolbar="#toolbar">
 				<thead>
@@ -65,6 +68,8 @@
 							data-align="center"
 							data-visible="{{$column.visible}}"
 							data-field="{{$column.field}}"
+							data-sortable="{{$column.sortable}}"
+							data-sort-order="desc"
 							data-formatter="{{$column.formatter}}">{{$column.title}}</th>
                     {{end}}
 					<th data-align="center">操作</th>
@@ -116,11 +121,15 @@
         return `<image height="50px" src="${value}"/>`;
     }
 
+    // 已选中的数据
+    var checkRows = [];
     // 列配置
     const Columns = {{.Columns}};
     const Data = {{.Data}};
     const Count = {{.Count}};
+    const PrimaryColumn = {{.PrimaryColumn}};
     $(document).ready(function (e) {
+        $('#table').bootstrapTable();
         // 刷新
         $('#table').on('refresh.bs.table', function (event) {
             location.reload();
@@ -131,6 +140,52 @@
             url.searchParams.set("_page", number);
             url.searchParams.set("_size", size);
             location.href = url.toString();
+        });
+        // 排序
+        $('#table').on('sort.bs.table', function (event, name, order) {
+            let url = new URL(location.href);
+            url.searchParams.set("_page", 1);
+            if (!name) {
+                url.searchParams.delete("_sort_name", name);
+                url.searchParams.delete("_sort_order", order);
+            } else {
+                url.searchParams.set("_sort_name", name);
+                url.searchParams.set("_sort_order", order);
+            }
+            console.log(url.toString())
+            location.href = url.toString();
+        });
+        // 全选
+        $('#table').on('check-all.bs.table', function (event, rowsAfter, rowsBefore) {
+            checkRows = [...rowsAfter];
+        });
+        // 取消全选
+        $('#table').on('uncheck-all.bs.table', function (event, rowsAfter, rowsBefore) {
+            checkRows = [];
+        });
+        // 单选
+        $('#table').on('check.bs.table', function (event, row, element) {
+            let index = checkRows.findIndex((item) => {
+                return item[PrimaryColumn] == row[PrimaryColumn]
+            });
+            if (index === -1) {
+                checkRows.push(row);
+            }
+        });
+        // 取消单选
+        $('#table').on('uncheck.bs.table', function (event, row, element) {
+            let index = checkRows.findIndex((item) => {
+                return item[PrimaryColumn] == row[PrimaryColumn]
+            });
+            if (index !== -1) {
+                checkRows.splice(index, 1);
+            }
+        });
+        // 批量删除
+        $("#batch-del").on('click', function (event) {
+            checkRows.forEach((item) => {
+                console.log("删除 " + item[PrimaryColumn]);
+            });
         });
     });
 </script>
@@ -198,7 +253,7 @@
 		<button class="btn btn-light add-btn">
 			<i class="bi bi-plus"></i>新增
 		</button>
-		<button class="btn btn-light batch-btn" disabled>
+		<button class="btn btn-light batch-btn" id="batch-del">
 			<i class="bi bi-trash"></i>批量删除
 		</button>
 		<button class="btn btn-light">

@@ -8,6 +8,7 @@ type Table struct {
 	Title            string             // 表格title
 	Columns          []*Column          // 所有列
 	columnMap        map[string]*Column // 所有列
+	PrimaryColumn    *Column            // 唯一列
 	FixedLeftNumber  int                // 左侧固定列数
 	FixedRightNumber int                // 右侧固定列数
 	loadTemplateData bool               // 请求模板的时候是否加载数据
@@ -27,6 +28,7 @@ func NewTable(tableName string) *Table {
 		loadTemplateData: true,
 		tableName:        tableName,
 		dataSource:       "default",
+		PrimaryColumn:    &Column{},
 	}
 }
 
@@ -48,6 +50,13 @@ func (t *Table) AddColumn(name, title string) *Column {
 	}
 	t.columnMap[name] = column
 	return column
+}
+
+// AddPrimaryColumn 设置唯一列
+func (t *Table) AddPrimaryColumn(name, title string) *Column {
+	col := t.AddColumn(name, title)
+	t.PrimaryColumn = col
+	return col
 }
 
 // GetColumns 获取所有列

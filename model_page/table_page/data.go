@@ -34,6 +34,16 @@ func (t *Table) GetData(param *QueryParam) (*TableData, error) {
 	if err != nil {
 		return nil, err
 	}
+	// 根据列配置处理最终值
+	for index, rows := range result.Rows {
+		for key := range rows {
+			column := t.columnMap[key]
+			if column == nil {
+				continue
+			}
+			result.Rows[index][key] = column.ParseValue(rows)
+		}
+	}
 	return result, nil
 }
 

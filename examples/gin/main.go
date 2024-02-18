@@ -39,17 +39,17 @@ type UserModel struct{}
 func (u *UserModel) Table() *table2.Table {
 	table := table2.NewTable("user")
 	table.SetTitle("用户列表")
-	table.AddColumn("id", "ID").SetPrimary().SetFormat(table2.LinkFormat)
+	table.AddPrimaryColumn("id", "ID").SetShowFormatName(table2.LinkFormat).SetSort()
 	table.AddColumn("name", "名称")
 	table.AddColumn("age", "年龄").SetHide()
 	table.AddColumn("sex", "性别").SetValueMap(map[string]any{
 		"1": "男",
 		"0": "女",
-	})
-	table.AddColumn("shot", "头像").SetFormat(table2.ImageFormat)
+	}).SetSort()
+	table.AddColumn("shot", "头像").SetShowFormatName(table2.ImageFormat)
 	table.Join("LEFT JOIN role ON user.role_id = role.id")
-	table.AddColumn("role_name", "所属组").JoinName("role.name")
-	table.AddColumn("created_at", "创建时间").DisplayDateTime("2006-01-02 15:04:05")
+	table.AddColumn("role_name", "所属组").JoinName("role.name").SetSort()
+	table.AddColumn("created_at", "创建时间").FormatDateTime("2006-01-02 15:04:05").SetSort()
 	return table
 }
 
@@ -59,7 +59,7 @@ type RoleModel struct {
 func (r *RoleModel) Table() *table2.Table {
 	table := table2.NewTable("role")
 	table.SetTitle("角色列表")
-	table.AddColumn("id", "ID").SetPrimary()
+	table.AddPrimaryColumn("id", "ID").SetSort()
 	table.AddColumn("name", "名称")
 	return table
 }
@@ -69,7 +69,7 @@ type TestModel struct{}
 func (t *TestModel) Table() *table2.Table {
 	table := table2.NewTable("test").SetDataSource("sqlite")
 	table.SetTitle("sqlite测试")
-	table.AddColumn("id", "ID").SetPrimary()
-	table.AddColumn("name", "名称")
+	table.AddPrimaryColumn("code", "ID").SetSort()
+	table.AddColumn("name", "名称").SetSort()
 	return table
 }

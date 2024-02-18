@@ -79,10 +79,13 @@ func (b *BootstrapAdminUI) LayoutPageRender(ctx *gin.Context) {
 type TablePageTemplateData struct {
 	Title            string           // 标题
 	Columns          []map[string]any // 列
+	PrimaryColumn    string           // 唯一列
 	Data             []map[string]any // 数据
 	Count            int64            // 总数
 	Size             int              // 数量
 	Page             int              // 页码
+	SortName         string           // 排序
+	SortOrder        string           // 排序
 	FixedLeftNumber  int              // 左侧固定列数
 	FixedRightNumber int              // 右侧固定列数
 }
@@ -92,21 +95,24 @@ func (b *BootstrapAdminUI) TablePageRender(ctx *gin.Context, tableModel *table_p
 	tmplData := TablePageTemplateData{
 		Title:            tableModel.Title,
 		Columns:          make([]map[string]any, 0, len(tableModel.GetColumns())),
+		PrimaryColumn:    tableModel.PrimaryColumn.Name,
 		Data:             tableData.Rows,
 		Count:            tableData.Count,
 		Size:             tableData.Size,
 		Page:             tableData.Page,
+		SortName:         ctx.Query("_sort_name"),
+		SortOrder:        ctx.Query("_sort_order"),
 		FixedLeftNumber:  tableModel.FixedLeftNumber,
 		FixedRightNumber: tableModel.FixedRightNumber,
 	}
 	for _, col := range tableModel.GetColumns() {
 		tmplData.Columns = append(tmplData.Columns, map[string]any{
-			"title":      col.Title,
-			"field":      col.Name,
-			"align":      "center",
-			"switchable": col.Primary,
-			"visible":    !col.Hide, // 是否显示该列
-			"formatter":  col.Format,
+			"title":     col.Title,
+			"field":     col.Name,
+			"align":     "center",
+			"visible":   !col.Hide, // 是否显示该列
+			"formatter": col.ShowFormat,
+			"sortable":  col.SortAble,
 		})
 	}
 	ctx.HTML(http.StatusOK, "model_table_new.tmpl", tmplData)
