@@ -2,12 +2,13 @@ package data_source
 
 import (
 	"fmt"
+	"time"
+
 	modeladmin "github.com/hl540/model-admin/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
-	"time"
 )
 
 const DriverMysql = "mysql"
@@ -45,8 +46,8 @@ func InitMysql(name string, conf *modeladmin.Database) error {
 
 // 解析dns
 func mysqlDsn(conf *modeladmin.Database) string {
-	if conf.Dns != "" {
-		return conf.Dns
+	if conf.Dsn != "" {
+		return conf.Dsn
 	}
 	return fmt.Sprintf(
 		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",

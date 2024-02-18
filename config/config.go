@@ -14,7 +14,7 @@ type Database struct {
 	Port         int    `yaml:"port"`          // 端口
 	Name         string `yaml:"name"`          // 库名
 	Prefix       string `yaml:"prefix"`        // 表名前缀
-	Dns          string `yaml:"dns"`           // 连接dns
+	Dsn          string `yaml:"dsn"`           // 连接dsn
 	MaxIdleConns int    `yaml:"maxIdle_conns"` // 最大空闲数
 	MaxOpenConns int    `yaml:"maxOpen_conns"` // 最大连接数
 }

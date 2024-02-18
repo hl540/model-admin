@@ -15,6 +15,7 @@ func init() {
 	// gin.SetMode(gin.ReleaseMode)
 	model_page.Register("user", new(UserModel))
 	model_page.Register("role", new(RoleModel))
+	model_page.Register("test", new(TestModel))
 }
 
 func main() {
@@ -58,6 +59,16 @@ type RoleModel struct {
 func (r *RoleModel) Table() *table2.Table {
 	table := table2.NewTable("role")
 	table.SetTitle("角色列表")
+	table.AddColumn("id", "ID").SetPrimary()
+	table.AddColumn("name", "名称")
+	return table
+}
+
+type TestModel struct{}
+
+func (t *TestModel) Table() *table2.Table {
+	table := table2.NewTable("test").SetDataSource("sqlite")
+	table.SetTitle("sqlite测试")
 	table.AddColumn("id", "ID").SetPrimary()
 	table.AddColumn("name", "名称")
 	return table

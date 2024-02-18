@@ -15,6 +15,9 @@ databases:
     name: test
     maxIdle_conns: 10
     maxOpen_conns: 100
+  sqlite:
+    driver: sqlite
+    dsn: ./data.db
 # 调试配置
 debug:
   enable: true
